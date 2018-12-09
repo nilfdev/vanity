@@ -1,0 +1,252 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+
+  <title>Vanity map</title>
+  <script src="scripts/d3.min.js"></script>
+  <script src="scripts/topojson.js"></script>
+  <script src="scripts/datamaps.world.min.js"></script>
+  <script src="scripts/datamaps.all.js"></script>
+  <script src="scripts/jquery-3.3.1.min.js"></script>
+
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="//resources/demos/style.css">
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+  <style>
+    body{
+      background-color: rgba(29, 133, 251, 0.698);
+    }
+    /* For mobile phones: */
+    /* [class*="col-"] {
+      width: 100%;
+    } */
+
+  /* .map-container{
+    position: relative;
+  }
+
+    @media only screen and (min-width: 300px) {
+      .map-container {width: 300px; height: 150px;}
+    }
+
+    @media only screen and (min-width: 500px) {
+      .map-container {width: 500px; height: 300px;}
+    }
+
+    @media only screen and (min-width: 700px) {
+      .map-container {width: 700px; height: 500px;}
+    }
+    @media only screen and (min-width: 1500px) {
+      .map-container {width: 1200px; height: 900px;}
+    } */
+  </style>
+</head>
+
+
+<body>
+  <!-- <div id="container" style="position: relative; width: 700px; height: 400px;"></div>
+  <script>
+    var map = new Datamap({ element: document.getElementById('container') });
+  </script>
+
+  <div id="containerUsa" style="position: relative; width: 500px; height: 300px;"></div> 
+
+    var map = new Datamap({
+      element: document.getElementById('containerUsa'),
+      scope: 'usa'
+    });
+
+
+-->
+
+
+
+  <div id="mapcontainer" class="map-container"></div>
+  <script>
+
+  </script>
+  <div id="log">
+    resize log
+  </div>
+  <script type="text/jscript">
+
+
+var resizeTimer;
+$(window).on('resize', function(e) {
+
+clearTimeout(resizeTimer);
+resizeTimer = setTimeout(function() {
+  refreshMap();
+    }, 250);
+
+});
+
+refreshMap();
+
+function refreshMap(){
+   $("#mapcontainer").empty();
+var mapScope;
+
+    var map = new Datamap({
+      element: document.getElementById("mapcontainer"),
+      projection: 'mercator',
+      responsive: true,
+      geographyConfig: {
+                popupOnHover: true,
+                highlightOnHover: true,
+                borderColor: '#444',
+                borderWidth: 0.5,
+                popupTemplate: function(geo, data) {
+                  return ['<div class="hoverinfo"><strong>',
+                          'Number of things in ' + geo.properties.name,
+                          ': ' + data.numberOfThings,
+                          '</strong></div>'].join('');
+                  }
+            },
+            fills: {
+                'MAJOR': '#306596',
+                'MEDIUM': '#0fa0fa',
+                'MINOR': '#bada55',
+                defaultFill: "#ABDDA4",
+            },
+      // fills: {
+      //   defaultFill: "#ABDDA4",
+      //   authorHasTraveledTo: "#fa0fa0"
+      // },
+      data: {
+        USA: { fillKey: "authorHasTraveledTo", numberOfThings: 2002},
+        JPN: { fillKey: "authorHasTraveledTo", numberOfThings: 10381 },
+        ITA: { fillKey: "authorHasTraveledTo" },
+        CRI: { fillKey: "authorHasTraveledTo" },
+        KOR: { fillKey: "authorHasTraveledTo" },
+        DEU: { fillKey: "authorHasTraveledTo" },
+      },
+
+       done: function(datamap) {
+            datamap.svg.selectAll('.datamaps-subunit').on('click', function(geography) {
+               // alert(geography.properties.name);
+               // mapScope = geography.properties.name
+               $( "#dialog" ).dialog( "open" );
+            });
+        },
+
+    
+
+    });
+
+      map.updateChoropleth({
+      
+          USA: {
+                fillKey: 'MEDIUM',
+                numberOfThings: 10381
+            }
+      });
+
+
+
+ var bombs = [{
+        name: 'Joe 4',
+        radius: 10,
+        yield: 400,
+        country: 'USSR',
+        fillKey: 'RUS',
+        significance: 'First fusion weapon test by the USSR (not "staged")',
+        date: '1953-08-12',
+         latitude: 50.07,
+        // longitude: 78.43
+      },{
+        name: 'RDS-37',
+        radius: 40,
+        yield: 1600,
+        country: 'USSR',
+        fillKey: 'RUS',
+        significance: 'First "staged" thermonuclear weapon test by the USSR (deployable)',
+        date: '1955-11-22',
+        // latitude: 50.07,
+        // longitude: 78.43
+
+      },{
+        name: 'Tsar Bomba',
+        radius: 75,
+        yield: 50000,
+        country: 'USSR',
+        fillKey: 'RUS',
+        significance: 'Largest thermonuclear weapon ever tested—scaled down from its initial 100 Mt design by 50%',
+        date: '1961-10-31',
+        // latitude: 73.482,
+        // longitude: 54.5854
+      }
+    ];
+   map.bubbles(bombs, {
+    popupTemplate: function (geo, data) {
+            return ['<div class="hoverinfo">' +  data.name,
+            '<br/>Payload: ' +  data.yield + ' kilotons',
+            '<br/>Country: ' +  data.country + '',
+            '<br/>Date: ' +  data.date + '',
+            '</div>'].join('');
+    }
+   });
+
+   newLabels = {'USA':'Some label', 'RUS':'123', };
+   map.labels({
+     'customLabelText': newLabels, 
+   labelColor: 'white', fontSize: 10
+   });
+
+  map.legend();
+  
+    // var colors = d3.scale.category10();
+
+    // window.setInterval(function () {
+    //   map.updateChoropleth({
+    //     USA: colors(Math.random() * 10),
+    //     RUS: colors(Math.random() * 100),
+    //     AUS: { fillKey: 'authorHasTraveledTo' },
+    //     BRA: colors(Math.random() * 50),
+    //     CAN: colors(Math.random() * 50),
+    //     ZAF: colors(Math.random() * 50),
+    //     IND: colors(Math.random() * 50),
+    //   });
+    // }, 2000);
+}
+</script>
+
+
+<script>
+$( function() {
+  $( "#dialog" ).dialog({
+    autoOpen: false,
+    show: {
+      effect: "blind",
+      duration: 1000
+    },
+    hide: {
+      effect: "explode",
+      duration: 1000
+    }
+  });
+
+  $( "#opener" ).on( "click", function() {
+    $( "#dialog" ).dialog( "open" );
+  });
+} );
+
+</script>
+</head>
+<body>
+
+<div id="dialog" title="Basic dialog">
+<p>This is an animated dialog which is useful for displaying information. The dialog window can be moved, resized and closed with the 'x' icon.</p>
+</div>
+
+<button id="opener">Open Dialog</button>
+</body>
+
+
+
+</html>
